@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="database" pattern="file:database//*||file:database" />
+</component>
