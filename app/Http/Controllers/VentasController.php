@@ -132,8 +132,6 @@ class VentasController extends Controller
 
             // Ensure $cart is an array
             if (!is_array($cart)) {
-                // Handle the case where $cart is not an array (this shouldn't happen under normal circumstances)
-                // For example, you can reset $cart to an empty array
                 $cart = [];
             }
 
