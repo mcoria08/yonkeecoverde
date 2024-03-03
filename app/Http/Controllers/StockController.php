@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Stock;
 use App\Models\Unidad;
 use App\Models\Pieza;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\DB;
@@ -139,16 +140,29 @@ class StockController extends Controller
     public function getStockData(Request $request)
     {
         $id = $request->input('stock_id');
-        $stock = DB::select("SELECT
-	st.id, st.id_unidad, st.id_pieza, st.part_name, st.part_number, st.location_in_stock, FORMAT(st.selling_price, 2) as selling_price,
-	uni.unidad, uni.modelo, uni.anio, uni.motor, uni.marca
-FROM
-	stocks AS st
-LEFT JOIN unidads AS uni ON uni.id=st.id_unidad
-WHERE
-	st.id=$id AND st.status='AVAILABLE'
-        ");
-        return response()->json($stock);
+
+        // look for the id in the cart content to avoid duplicates
+        $duplicated = false;
+        Cart::instance('yonkeecoverde')->content()->each(function ($item) use ($id, &$duplicated) {
+            if ($item->id === $id) {
+                $duplicated = true;
+            }
+        });
+
+        if ($duplicated === true) {
+            return response()->json('duplicated');
+        } else {
+            $stock = DB::select("SELECT
+                    st.id, st.id_unidad, st.id_pieza, st.part_name, st.part_number, st.location_in_stock, FORMAT(st.selling_price, 2) as selling_price,
+                    uni.unidad, uni.modelo, uni.anio, uni.motor, uni.marca
+                FROM
+                    stocks AS st
+                LEFT JOIN unidads AS uni ON uni.id=st.id_unidad
+                WHERE
+                    st.id=$id AND st.status='AVAILABLE'
+                        ");
+            return response()->json($stock);
+        }
     }
 
 

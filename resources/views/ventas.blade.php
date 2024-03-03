@@ -18,7 +18,6 @@
         <tr>
             <th>Id</th>
             <th>Vendedor</th>
-            <th>Nombre de la Parte</th>
             <th>Cliente</th>
             <th>Sucursal</th>
             <th>Fecha Venta</th>
@@ -60,7 +59,6 @@
                             $(nTd).html("<a href='/ventas/"+oData.id+"/ver'>"+oData.id+"</a>");
                         }},
                     {data: 'vendedor', name: 'vendedor'},
-                    {data: 'part_name', name: 'part_name'},
                     {data: 'customer', name: 'customer'},
                     {data: 'sucursal', name: 'sucursal'},
                     {data: 'fecha_venta', name: 'fecha_venta'},

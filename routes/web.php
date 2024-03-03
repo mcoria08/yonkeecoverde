@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UnidadController;
 
@@ -9,6 +10,7 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\PiezasController;
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\VentasController;
+use Gloudemans\Shoppingcart\Facades\Cart;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +33,10 @@ Route::get('unidad', [UnidadController::class, 'index'])->name('unidad.index');
 Route::get('unidad/{id}/ver', [UnidadController::class, 'show'])->name('unidad.show');
 
 Route::get('/dashboard', function () {
+    //Creating the store instance
+    $user = Auth::user();
+    Cart::instance('yonkeecoverde')->restore($user->id);
+
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -87,6 +93,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/venta-nueva', [VentasController::class, 'new'])->name('ventas.new');
     Route::get('/search', [StockController::class, 'search'])->name('stock.search');
     Route::post('/add-item-to-sale', [VentasController::class, 'addItemToSale'])->name('ventas.addItemToSale');
+    Route::get('/get-sub-total', [VentasController::class, 'getSubTotal'])->name('ventas.getSubTotal');
+    Route::get('/delete-article', [VentasController::class, 'deleteArticle'])->name('ventas.deleteArticle');
+    Route::get('/ver-inventario', [VentasController::class, 'seeCart'])->name('ventas.seeCart');
+    Route::post('/registerSale', [VentasController::class, 'registerSale'])->name('ventas.registerSale');
+    Route::get('/recibo/{id}/ver', [VentasController::class, 'showReceipt'])->name('ventas.showReceipt');
 
     // Miscellaneous
     Route::get('/generate-password', [UsuariosController::class, 'saveGeneratePassword'])->name('generate.password');
