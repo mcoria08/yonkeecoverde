@@ -292,25 +292,11 @@ return [
     'menu' => [
         // Navbar items:
         [
-            'type'         => 'navbar-search',
-            'text'         => 'buscar',
-            'topnav_right' => true,
-        ],
-        [
             'type'         => 'fullscreen-widget',
             'topnav_right' => true,
         ],
 
         // Sidebar items:
-        [
-            'type' => 'sidebar-menu-search',
-            'text' => 'buscar',
-        ],
-        [
-            'text' => 'blog',
-            'url'  => 'admin/blog',
-            'can'  => 'manage-blog',
-        ],
         // [
         //     'text'        => 'pages',
         //     'url'         => 'admin/pages',
@@ -323,6 +309,7 @@ return [
             'text' => 'Unidades',
             'url'  => 'dashboard',
             'icon' => 'fas fa-fw fa-user',
+            'key' => 'unidades',
         ],
 //        [
 //            'text' => 'Ingreso Unidades',
@@ -389,11 +376,6 @@ return [
             'text'       => 'Ventas',
             'icon_color' => 'red',
             'url'        => 'ventas',
-        ],
-        [
-            'text'       => 'Cortes',
-            'icon_color' => 'yellow',
-            'url'        => 'cash-cut',
         ],
         [
             'text'       => 'Gastos/Devoluciones',

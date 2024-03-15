@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CashBoxController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -29,16 +30,7 @@ Route::redirect('/', 'login');
     return view('welcome');
 });*/
 
-Route::get('unidad', [UnidadController::class, 'index'])->name('unidad.index');
-Route::get('unidad/{id}/ver', [UnidadController::class, 'show'])->name('unidad.show');
 
-Route::get('/dashboard', function () {
-    //Creating the store instance
-    $user = Auth::user();
-    Cart::instance('yonkeecoverde')->restore($user->id);
-
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 /*Route::get('/new', function () {
     return view('car-new');
@@ -47,11 +39,22 @@ Route::get('/dashboard', function () {
 //Route::get('images/{id}/{autos}',[FileController::class, 'getImages'])->name('getImages');
 
 Route::middleware('auth')->group(function () {
+
+    Route::get('/dashboard', function () {
+        //Creating the store instance
+        $user = Auth::user();
+        Cart::instance('yonkeecoverde')->restore($user->id);
+
+        return view('dashboard');
+    })->middleware(['auth', 'verified'])->name('dashboard');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Unidades
+    Route::get('unidad', [UnidadController::class, 'index'])->name('unidad.index');
+    Route::get('unidad/{id}/ver', [UnidadController::class, 'show'])->name('unidad.show');
     Route::get('/new', function () {
         return view('car-new');
     })->name('new');
@@ -90,7 +93,7 @@ Route::middleware('auth')->group(function () {
 
     // Ventas
     Route::get('/ventas', [VentasController::class, 'index'])->name('ventas.index');
-    Route::get('/venta-nueva', [VentasController::class, 'new'])->name('ventas.new');
+    Route::match(['get', 'post'],'/venta-nueva', [VentasController::class, 'new'])->name('ventas.new');
     Route::get('/search', [StockController::class, 'search'])->name('stock.search');
     Route::post('/add-item-to-sale', [VentasController::class, 'addItemToSale'])->name('ventas.addItemToSale');
     Route::get('/get-sub-total', [VentasController::class, 'getSubTotal'])->name('ventas.getSubTotal');
@@ -98,9 +101,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/ver-inventario', [VentasController::class, 'seeCart'])->name('ventas.seeCart');
     Route::post('/registerSale', [VentasController::class, 'registerSale'])->name('ventas.registerSale');
     Route::get('/recibo/{id}/ver', [VentasController::class, 'showReceipt'])->name('ventas.showReceipt');
+    Route::get('/cerrar-caja', [VentasController::class, 'cerrarCaja'])->name('cerrarCaja');
 
     // Miscellaneous
     Route::get('/generate-password', [UsuariosController::class, 'saveGeneratePassword'])->name('generate.password');
+
+    // Route to open cash box
+    Route::post('/cash-box/open', [CashBoxController::class, 'openCashBox'])->name('cash-box.open');
+    Route::get('checkCashBoxStatus', [CashBoxController::class, 'checkCashBoxStatus'])->name('cash-box.status');
+    Route::post('/cash-box/close', [CashBoxController::class, 'closeCashBox'])->name('cash-box.close');
 
 });
 

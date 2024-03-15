@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashBox;
 use App\Models\Customer;
 use App\Models\Pieza;
 use App\Models\Stock;
@@ -54,6 +55,9 @@ class VentasController extends Controller
 
     public function new()
     {
+        // Check if the box cash is open
+        $cashBox = CashBox::whereNull('closed_at')->latest()->first();
+
         $stocks = Stock::select('*')->get();
         $customers = Customer::select('*')->get();
         $locations = Sucursales::select('*')->get();
@@ -66,7 +70,7 @@ class VentasController extends Controller
         //Cart::remove('620d670d95f0419e35f9182695918c68');
         //dd($cartContent);
 
-        return view('ventas-new', compact('stocks',  'customers', 'locations', 'cartContent'));
+        return view('ventas-new', compact('stocks',  'customers', 'locations', 'cartContent', 'cashBox'));
     }
 
     /**
@@ -290,6 +294,69 @@ class VentasController extends Controller
                     VENT.id_venta=' . $nId);
 
         return view('recibo', compact('nId', 'venta', 'listItems'));
+    }
+
+
+    public function cerrarCaja()
+    {
+        // Retrieve the latest cash box record opened by the current cashier
+        $cashBox = CashBox::whereNotNull('opened_at')
+            ->where('opened_by', Auth::id())
+            ->latest()
+            ->first();
+
+        if (!$cashBox) {
+            return redirect()->route('ventas.index');
+        }
+
+        // Calculate total sales amount for the day for the current cashier
+        $totalSales = Ventas::where('id_usuario', $cashBox->opened_by)
+            ->whereDate('created_at', today())
+            ->sum('total');
+
+        // Prepare the response data
+        $data = [
+            'openingAmount' => $cashBox->initial_amount,
+            'cashPaymentAmount' => Ventas::where('id_usuario', $cashBox->opened_by)
+                ->whereDate('created_at', today())
+                ->where('tipo_pago', 'efectivo')
+                ->sum('total'),
+            'creditCardPaymentAmount' => Ventas::where('id_usuario', $cashBox->opened_by)
+                ->whereDate('created_at', today())
+                ->where('tipo_pago', 'tarjeta')
+                ->sum('total'),
+            'totalSalesAmount' => $totalSales + $cashBox->initial_amount,
+        ];
+
+        // Get the user data
+        $user = Auth::user();
+
+        return view('caja-cerrar', compact('data', 'user'));
+    }
+
+    public function getFinalAmount(){
+        /**
+         * @TODO Hay un error al monento de obtener el monto final de la caja
+         * Al momento de cerrar la caja debo de marcar aquellas ventas como "CERRADAS" para evitar contabilizarlas doble
+         *
+         */
+
+
+        // Get initial amount of the cash box
+        $cashBox = CashBox::whereNotNull('opened_at')
+            ->where('opened_by', Auth::id())
+            ->latest()
+            ->first();
+
+
+        // Calculate total sales amount for the day for the current cashier
+        $totalSales = Ventas::where('id_usuario', $cashBox->opened_by)
+            ->whereDate('created_at', today())
+            ->sum('total');
+
+        $nTotal = $totalSales + $cashBox->initial_amount;
+
+        return $nTotal;
     }
 
 }

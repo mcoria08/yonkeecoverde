@@ -7,180 +7,210 @@
 @stop
 
 @section('content')
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <!-- left column -->
-                <div class="col-md-12">
-                    <!-- general form elements -->
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">Formulario</h3>
+
+    @if (!$cashBox)
+        <div class="alert red-custom" role="alert">
+            <h4 class="alert-heading">Caja no abierta</h4>
+            <p>Para poder realizar una venta, es necesario abrir la caja.</p>
+            <hr>
+            <form id="openCashBoxForm" method="post"  autocomplete="off" autocorrect="off" autocapitalize="off">
+                @csrf
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="txtAmount">Cantidad</label>
+                            <input type="number" class="form-control @error('txtAmount') is-invalid @enderror" name="txtAmount" id="txtAmount" placeholder="Cantidad" required value="{{ old('txtAmount') }}">
+                            @error('txtAmount')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                            @enderror
                         </div>
-                        <div class="card-body">
-                            <form id="sales_create_form" name="sales_create_form" enctype="multipart/form-data" method="post">
-                                @csrf
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 ">
+                        <button type="button" id="openCashBoxBtn" class="btn btn-success">Abrir Caja</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    @else
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- left column -->
+                    <div class="col-md-12">
+                        <!-- general form elements -->
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Formulario</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="sales_create_form" name="sales_create_form" enctype="multipart/form-data" method="post">
+                                    @csrf
 
-                                <div class="row">
+                                    <div class="row">
 
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label for="txtCustomer">Cliente</label>
-                                            <x-adminlte-select required
-                                                               class="form-control @error('txtCustomer') is-invalid @enderror"
-                                                               name="txtCustomer" id="txtCustomer" required>
-                                                <option value="">-- Selecciona un Cliente --</option>
-                                                @foreach($customers as $customer)
-                                                    <option value="{{$customer->id}}">[{{$customer->rfc}}]
-                                                        - {{$customer->name}}</option>
-                                                @endforeach
-                                            </x-adminlte-select>
-                                            @error('txtPartName')
-                                            <span class="invalid-feedback" role="alert">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="txtCustomer">Cliente</label>
+                                                <x-adminlte-select required
+                                                                   class="form-control @error('txtCustomer') is-invalid @enderror"
+                                                                   name="txtCustomer" id="txtCustomer" required>
+                                                    <option value="">-- Selecciona un Cliente --</option>
+                                                    @foreach($customers as $customer)
+                                                        <option value="{{$customer->id}}">[{{$customer->rfc}}]
+                                                            - {{$customer->name}}</option>
+                                                    @endforeach
+                                                </x-adminlte-select>
+                                                @error('txtPartName')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="txtCustomer">Oficina</label>
+                                                <x-adminlte-select required
+                                                                   class="form-control @error('txtLocation') is-invalid @enderror"
+                                                                   name="txtLocation" id="txtLocation" required>
+                                                    <option value="">-- Selecciona una Oficina --</option>
+                                                    @foreach($locations as $location)
+                                                        <option value="{{$location->id}}">{{$location->nombre}}</option>
+                                                    @endforeach
+                                                </x-adminlte-select>
+                                                @error('txtLocation')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="txtName">Persona que recibe</label>
+                                                <input type="text" class="form-control @error('txtName') is-invalid @enderror" name="txtName" id="txtName"
+                                                       placeholder="Persona que recibe" required value="{{ old('txtName') }}">
+                                                @error('txtName')
+                                                <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
                                             </span>
-                                            @enderror
+                                                @enderror
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label for="txtCustomer">Oficina</label>
-                                            <x-adminlte-select required
-                                                               class="form-control @error('txtLocation') is-invalid @enderror"
-                                                               name="txtLocation" id="txtLocation" required>
-                                                <option value="">-- Selecciona una Oficina --</option>
-                                                @foreach($locations as $location)
-                                                    <option value="{{$location->id}}">{{$location->nombre}}</option>
-                                                @endforeach
-                                            </x-adminlte-select>
-                                            @error('txtLocation')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                            @enderror
-                                        </div>
-                                    </div>
 
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label for="txtName">Persona que recibe</label>
-                                            <input type="text" class="form-control @error('txtName') is-invalid @enderror" name="txtName" id="txtName"
-                                                   placeholder="Persona que recibe" required value="{{ old('txtName') }}">
-                                            @error('txtName')
-                                            <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <div class="input-group input-group-lg">
-                                                <input type="search" id="txtSearch" name="txtSearch"
-                                                       class="form-control form-control-lg"
-                                                       placeholder="Buscar producto" value="">
-                                                <div class="input-group-append">
-                                                    <button type="submit" class="btn btn-lg btn-default btn-search">
-                                                        <i class="fa fa-search"></i>
-                                                    </button>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="input-group input-group-lg">
+                                                    <input type="search" id="txtSearch" name="txtSearch"
+                                                           class="form-control form-control-lg"
+                                                           placeholder="Buscar producto" value="">
+                                                    <div class="input-group-append">
+                                                        <button type="submit" class="btn btn-lg btn-default btn-search">
+                                                            <i class="fa fa-search"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
 
-                                <!-- /.card-body -->
+                                    <!-- /.card-body -->
 
 
-                                <div class="row">
-                                    <div class="col-12 table-responsive">
-                                        <table class="table table-striped" id="tableSales">
-                                            <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Nombre Pieza</th>
-                                                <th>Automovil</th>
-                                                <th>Modelo</th>
-                                                <th>Año</th>
-                                                <th style="text-align:right">Subtotal</th>
-                                                <th style="text-align:center">Acciones</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            @if ($cartContent->isNotEmpty())
-                                                @foreach($cartContent as $item)
-                                                    <tr class="sales-row" data-rowId="{{$item->rowId}}">
-                                                        <td>{{ $loop->iteration }}</td>
-                                                        <td>{{$item->name}}</td>
-                                                        <td>{{$item->options->marca}}</td>
-                                                        <td>{{$item->options->modelo}}</td>
-                                                        <td>{{$item->options->anio}}</td>
-                                                        <td style="text-align:right">$ {{number_format($item->price,2)}}</td>
-                                                        <td style="text-align:center">
-                                                            <div class="btn-group">
-                                                                <a href="{{ url('delete-article') }}" data-delete-rowId="{{$item->rowId}}" title="Borrar Artículo" class="delete-article tip btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @endif
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-
-                                    <div class="col-6">
-
-                                    </div>
-
-                                    <div class="col-6">
-                                        <p class="lead">Desgloce</p>
-                                        <div class="table-responsive">
-                                            <table class="table">
+                                    <div class="row">
+                                        <div class="col-12 table-responsive">
+                                            <table class="table table-striped" id="tableSales">
+                                                <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Nombre Pieza</th>
+                                                    <th>Automovil</th>
+                                                    <th>Modelo</th>
+                                                    <th>Año</th>
+                                                    <th style="text-align:right">Subtotal</th>
+                                                    <th style="text-align:center">Acciones</th>
+                                                </tr>
+                                                </thead>
                                                 <tbody>
-                                                <tr>
-                                                    <th style="width:50%">Subtotal:</th>
-                                                    <td class="subTotal"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>IVA (16%)</th>
-                                                    <td class="iva"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Total:</th>
-                                                    <td class="total"></td>
-                                                </tr>
+                                                @if ($cartContent->isNotEmpty())
+                                                    @foreach($cartContent as $item)
+                                                        <tr class="sales-row" data-rowId="{{$item->rowId}}">
+                                                            <td>{{ $loop->iteration }}</td>
+                                                            <td>{{$item->name}}</td>
+                                                            <td>{{$item->options->marca}}</td>
+                                                            <td>{{$item->options->modelo}}</td>
+                                                            <td>{{$item->options->anio}}</td>
+                                                            <td style="text-align:right">$ {{number_format($item->price,2)}}</td>
+                                                            <td style="text-align:center">
+                                                                <div class="btn-group">
+                                                                    <a href="{{ url('delete-article') }}" data-delete-rowId="{{$item->rowId}}" title="Borrar Artículo" class="delete-article tip btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></a>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
 
-                                </div>
+                                    <div class="row">
 
-                                <div class="row no-print">
-                                    <div class="col-12">
-                                        <button type="button" class="btn btn-success float-right btn-register-sale"><i
-                                                class="far fa-credit-card"></i> Registrar Venta
-                                        </button>
+                                        <div class="col-6">
+
+                                        </div>
+
+                                        <div class="col-6">
+                                            <p class="lead">Desgloce</p>
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <tbody>
+                                                    <tr>
+                                                        <th style="width:50%">Subtotal:</th>
+                                                        <td class="subTotal"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>IVA (16%)</th>
+                                                        <td class="iva"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Total:</th>
+                                                        <td class="total"></td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
                                     </div>
-                                </div>
 
-                                <input type="hidden" name="typePayment" id="typePayment" value="efectivo">
-                            </form>
+                                    <div class="row no-print">
+                                        <div class="col-12">
+                                            <button type="button" class="btn btn-success float-right btn-register-sale"><i
+                                                    class="far fa-credit-card"></i> Registrar Venta
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" name="typePayment" id="typePayment" value="efectivo">
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    @endif
 
     <!-- Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
@@ -255,6 +285,11 @@
         }
         .btn, .btn-app{
             border-radius: 3px;
+        }
+
+        .red-custom{
+            background-color: #e35d6a;
+            color: white;
         }
     </style>
 @stop
@@ -485,6 +520,36 @@
                 }
             });
         });
+
+        $('#openCashBoxForm').submit(function(event) {
+            event.preventDefault(); // Prevent default form submission
+            submitForm();
+        });
+
+        $('#openCashBoxBtn').click(function() {
+            submitForm();
+        });
+
+        function submitForm() {
+            $.ajax({
+                url: "{{ route('cash-box.open') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    amount: $('#txtAmount').val()
+                },
+                success: function(response, status, xhr) {
+                    console.log(response)
+                    if (xhr.status === 200) {
+                        window.location.href = "{{ url('/ventas') }}";
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    // Handle error scenario
+                }
+            });
+        }
     </script>
 
 @stop
